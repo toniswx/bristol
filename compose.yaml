@@ -1,0 +1,48 @@
+
+services:
+  backend-dev:  # Development environment
+    container_name: backend-dev
+    user: root  # Run as root
+    build:
+      context: .
+      dockerfile: Dockerfile.dev  # Use Dockerfile.dev
+    environment:
+      - NODE_ENV=development  # Optional: Override NODE_ENV here
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app  # Mount local code for hot-reloading
+      - /app/node_modules  # Prevent overwriting node_modules
+    command: npm run start:dev
+  db:
+    image: bitnami/postgresql:latest
+    container_name: postgresql
+    restart: always
+    env_file: .env.docker
+    user: '1001'
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRESQL_REPLICATION_USE_PASSFILE=no
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./rkt-dev:/bitnami/postgresql/data
+    networks:
+      - backend-network
+  redis:
+    image: redis:7.4-rc2-alpine
+    ports:
+      - '9999:9999'
+    networks:
+      - backend-network
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  backend-network:
+    driver: bridge
+  
