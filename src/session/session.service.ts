@@ -55,11 +55,4 @@ export class SessionService {
 
     return token;
   }
-
-  verifyToken(token: string) {
-    const isValidToken = this.jwtService.verify<JwtPayload>(token, {
-      ignoreExpiration: false,
-    });
-    return isValidToken;
-  }
 }
