@@ -9,8 +9,8 @@ async function bootstrap() {
 
   app.use(cookieParser());
   const config = new DocumentBuilder()
-    .setTitle('Proline')
-    .setDescription('The Proline api')
+    .setTitle('Bristol')
+    .setDescription('Bristol API - DEV')
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
@@ -23,6 +23,9 @@ async function bootstrap() {
       transform: true, // Automatically transform payloads to DTO instances
     }),
   );
+  app.enableCors({
+    origin: ['localhost'],
+  });
 
   await app.listen(process.env.PORT ?? 5000);
 }

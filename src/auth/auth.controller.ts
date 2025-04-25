@@ -4,6 +4,7 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import loginDto from 'src/user/dto/login.dto';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { JwtPayload, SessionService } from '../session/session.service';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +33,7 @@ export class AuthController {
 
     return;
   }
+  @UseGuards(AuthGuard)
   @Post('session')
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   session(@Req() request: Request): JwtPayload {

@@ -7,12 +7,15 @@ import { hashSync, compareSync } from 'bcryptjs';
 import loginDto from '../user/dto/login.dto';
 import { PrismaService } from 'src/prisma.service';
 import { SessionService } from 'src/session/session.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly session: SessionService,
+    private readonly jwtService: JwtService,
   ) {}
   hashPassword(passwordToEncrypt: string): string {
     const encryptedPassword = hashSync(passwordToEncrypt, 2);
@@ -39,6 +42,7 @@ export class AuthService {
       throw new NotFoundException();
     }
 
+    console.log(userData.id);
     const isValidPassword = this.comparePassword(
       userData.password,
       loginDto.password,
