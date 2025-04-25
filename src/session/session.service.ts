@@ -2,11 +2,12 @@ import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
-interface JwtPayload {
+export interface JwtPayload {
   sub: string;
   iat?: number;
   exp?: number;
 }
+
 @Injectable()
 export class SessionService {
   constructor(
@@ -57,9 +58,8 @@ export class SessionService {
 
   verifyToken(token: string) {
     const isValidToken = this.jwtService.verify<JwtPayload>(token, {
-      ignoreExpiration: false, // Ensure expiration is checked
+      ignoreExpiration: false,
     });
-    console.log(isValidToken);
     return isValidToken;
   }
 }
