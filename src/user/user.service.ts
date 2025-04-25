@@ -20,6 +20,19 @@ export class UserService {
     private prisma: PrismaService,
   ) {}
 
+  async getUserData(userId: string): Promise<User> {
+    const data = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!data) {
+      throw new NotFoundException();
+    }
+    return data;
+  }
+
   async createUser(createUserDto: createUserDto): Promise<User> {
     const hashedPassword = this.authService.hashPassword(
       createUserDto.password,
@@ -94,6 +107,4 @@ export class UserService {
       }
     }
   }
-
-  async getUserData() {}
 }
