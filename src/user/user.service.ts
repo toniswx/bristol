@@ -1,26 +1,99 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthService } from './../auth/auth.service';
+import { Prisma, PrismaClient, User } from '@prisma/client';
+import {
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import createUserDto from './dto/create-one.dto';
+import { randomUUID } from 'crypto';
+import { PrismaService } from 'src/prisma.service';
+import deleteUserDTO from './dto/delete-user.dto';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    private readonly authService: AuthService,
+    private prisma: PrismaService,
+  ) {}
+
+  async createUser(createUserDto: createUserDto): Promise<User> {
+    const hashedPassword = this.authService.hashPassword(
+      createUserDto.password,
+    );
+    try {
+      return await this.prisma.$transaction(async (tx: PrismaClient) => {
+        const newUser = await tx.user.create({
+          data: {
+            ...createUserDto,
+            password: hashedPassword,
+            id: randomUUID(),
+          },
+        });
+
+        return newUser;
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2002':
+            throw new ConflictException(
+              'Invalid email,try again with a valid one.',
+            );
+          case 'P2025':
+            throw new NotFoundException('Required records not found');
+          default:
+            throw new InternalServerErrorException('Database operation failed');
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+  async deleteUser(deleteUserDTO: deleteUserDTO): Promise<object> {
+    try {
+      const userData = await this.prisma.user.findFirst({
+        where: {
+          email: deleteUserDTO.email,
+        },
+      });
+
+      if (!userData) {
+        throw new NotFoundException();
+      }
+      const comparePasswords = this.authService.comparePassword(
+        userData.password,
+        deleteUserDTO.password,
+      );
+      if (!comparePasswords) {
+        throw new UnauthorizedException();
+      }
+      await this.prisma.user.delete({
+        where: {
+          email: deleteUserDTO.email,
+        },
+      });
+
+      return {
+        message: 'User deleted successfully.',
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2025':
+            throw new NotFoundException('Required records not found');
+          default:
+            throw new InternalServerErrorException('Database operation failed');
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  async getUserData() {}
 }

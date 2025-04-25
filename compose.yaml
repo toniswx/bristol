@@ -1,34 +1,39 @@
-
 services:
-  backend-dev:  # Development environment
-    container_name: backend-dev
-    user: root  # Run as root
+  server_dev:
+    container_name: server
+    user: 'root'
     build:
       context: .
-      dockerfile: Dockerfile.dev  # Use Dockerfile.dev
+      dockerfile: Dockerfile.dev
     environment:
-      - NODE_ENV=development  # Optional: Override NODE_ENV here
+      - NODE_ENV=development
     ports:
-      - "8000:8000"
+      - '5000:5000'
     volumes:
-      - .:/app  # Mount local code for hot-reloading
-      - /app/node_modules  # Prevent overwriting node_modules
-    command: npm run start:dev
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - backend-network
+    depends_on:
+      - db
+      - redis
   db:
     image: bitnami/postgresql:latest
     container_name: postgresql
     restart: always
-    env_file: .env.docker
-    user: '1001'
+    env_file: ./.env
+    user: 'root'
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DB:?err}
       - POSTGRESQL_REPLICATION_USE_PASSFILE=no
+      - BITNAMI_DEBUG=true
+      - PG_DATA_DIR=/bitnami/postgresql/data
     ports:
       - '5432:5432'
     volumes:
-      - ./rkt-dev:/bitnami/postgresql/data
+      - postgres_data:/bitnami/postgresql/data
     networks:
       - backend-network
   redis:
@@ -39,10 +44,10 @@ services:
       - backend-network
 
 volumes:
-  db:
+  postgres_data:
     driver: local
+    name: prolin
 
 networks:
   backend-network:
     driver: bridge
-  
