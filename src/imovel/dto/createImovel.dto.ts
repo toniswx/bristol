@@ -1,35 +1,49 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
-  IsString,
+  IsBoolean,
+  IsDate,
   IsNotEmpty,
   IsNumber,
-  IsPositive,
-  IsInt,
-  Length,
+  IsString,
 } from 'class-validator';
 
-export class CreateImovelDto {
+export class ImovelDTO {
   @ApiProperty({
     example: 'Modern Apartment in Downtown',
-    required: true,
+    description: 'Title of the property',
   })
   @IsString()
   @IsNotEmpty()
-  @Length(5, 100)
   title: string;
 
   @ApiProperty({
-    example: 'Spacious 3-bedroom apartment with great view...',
-    required: true,
+    example: '2023-01-01T00:00:00.000Z',
+    description: 'Date when the property was posted',
+  })
+  @IsDate()
+  @Type(() => Date)
+  postedAt: Date;
+
+  @ApiProperty({
+    example: '2023-01-02T00:00:00.000Z',
+    description: 'Date when the property was last updated',
+  })
+  @IsDate()
+  @Type(() => Date)
+  lastUpdate: Date;
+
+  @ApiProperty({
+    example: 'Spacious 3-bedroom apartment with great view',
+    description: 'Detailed description of the property',
   })
   @IsString()
   @IsNotEmpty()
-  @Length(10, 2000)
   textDescription: string;
 
   @ApiProperty({
     example: 'São Paulo',
-    required: true,
+    description: 'State where the property is located',
   })
   @IsString()
   @IsNotEmpty()
@@ -37,75 +51,81 @@ export class CreateImovelDto {
 
   @ApiProperty({
     example: 'São Paulo',
-    required: true,
+    description: 'City where the property is located',
   })
   @IsString()
   @IsNotEmpty()
   city: string;
 
   @ApiProperty({
-    example: '01311-000',
-    required: true,
+    example: '01311-100',
+    description: 'Postal code of the property',
   })
   @IsString()
   @IsNotEmpty()
-  @Length(8, 9)
   CEP: string;
 
   @ApiProperty({
-    example: 500000.0,
-    required: true,
+    example: 1500000.5,
+    description: 'Price of the property',
   })
   @IsNumber()
-  @IsPositive()
+  @IsNotEmpty()
   price: number;
 
   @ApiProperty({
     example: 'R$ 2.500,00',
-    required: true,
+    description: 'IPTU value of the property',
   })
   @IsString()
   @IsNotEmpty()
   IPTU: string;
 
   @ApiProperty({
-    example: 3,
-    required: true,
+    example: 4,
+    description: 'Total number of rooms',
   })
-  @IsInt()
-  @IsPositive()
+  @IsNumber()
+  @IsNotEmpty()
   rooms: number;
 
   @ApiProperty({
     example: 2,
-    required: true,
+    description: 'Number of bathrooms',
   })
-  @IsInt()
-  @IsPositive()
+  @IsNumber()
+  @IsNotEmpty()
   bathrooms: number;
 
   @ApiProperty({
     example: 1,
-    required: true,
+    description: 'Number of garage spaces',
   })
-  @IsInt()
-  @IsPositive()
+  @IsNumber()
+  @IsNotEmpty()
   garage: number;
 
   @ApiProperty({
-    example: 85.5,
-    required: true,
+    example: true,
+    description: 'Whether the property has parking',
   })
-  @IsNumber()
-  @IsPositive()
-  sizeInSquareMeters: number;
+  @IsBoolean()
+  @IsNotEmpty()
+  hasParking: boolean;
 
   @ApiProperty({
-    example: 'a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6',
-    required: true,
-    description: 'ID of the user who owns this property',
+    example: 3.5,
+    description: 'Number of bedrooms (can be half rooms)',
   })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  userId: string;
+  bedrooms: number;
+
+  @ApiProperty({
+    example: 125.75,
+    description: 'Total area in square meters',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  area: number;
 }
