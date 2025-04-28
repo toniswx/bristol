@@ -13,12 +13,14 @@ import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/prisma.service';
 import deleteUserDTO from './dto/delete-user.dto';
 import { UserDataDTO } from './dto/get-one.dto';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly authService: AuthService,
     private prisma: PrismaService,
+    private readonly sessionService: SessionService,
   ) {}
 
   async getUserData(userId: string): Promise<UserDataDTO> {
@@ -52,7 +54,6 @@ export class UserService {
             id: randomUUID(),
           },
         });
-
         return newUser;
       });
     } catch (error) {
