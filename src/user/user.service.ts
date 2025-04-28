@@ -12,6 +12,7 @@ import createUserDto from './dto/create-one.dto';
 import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/prisma.service';
 import deleteUserDTO from './dto/delete-user.dto';
+import { UserDataDTO } from './dto/get-one.dto';
 
 @Injectable()
 export class UserService {
@@ -20,10 +21,15 @@ export class UserService {
     private prisma: PrismaService,
   ) {}
 
-  async getUserData(userId: string): Promise<User> {
+  async getUserData(userId: string): Promise<UserDataDTO> {
     const data = await this.prisma.user.findFirst({
       where: {
         id: userId,
+      },
+      select: {
+        username: true,
+        imoveis: true,
+        id: true,
       },
     });
 
