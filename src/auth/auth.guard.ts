@@ -1,7 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'jsonwebtoken';
 
-interface CustomRequest {
+export interface CustomRequest {
+  userId?: any; // or whatever type your userId is
   cookies?: {
     set?: string;
   };
@@ -17,9 +19,14 @@ export class AuthGuard implements CanActivate {
 
     if (!sessionToken) return false;
     try {
-      const isValidJWT = await this.JwtService.verifyAsync(sessionToken, {
-        ignoreExpiration: true,
-      });
+      const isValidJWT: JwtPayload = await this.JwtService.verifyAsync(
+        sessionToken,
+        {
+          ignoreExpiration: true,
+        },
+      );
+
+      request.userId = isValidJWT.sub;
 
       console.log(isValidJWT);
       if (isValidJWT) return true;
