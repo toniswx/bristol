@@ -8,7 +8,6 @@ import loginDto from '../user/dto/login.dto';
 import { PrismaService } from 'src/prisma.service';
 import { SessionService } from 'src/session/session.service';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +41,6 @@ export class AuthService {
       throw new NotFoundException();
     }
 
-    console.log(userData.id);
     const isValidPassword = this.comparePassword(
       userData.password,
       loginDto.password,
@@ -52,7 +50,6 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    //create session
     const sessionData = this.session.createSession(userData.id);
 
     return sessionData;
