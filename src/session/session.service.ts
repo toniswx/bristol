@@ -20,9 +20,31 @@ export class SessionService {
     private readonly jwtService: JwtService,
   ) {}
 
-  createSession(userId: string) {
+  async verifySessionTokenInCache(userId: string) {
+    const sessionToken = await this.cache.get(`key::${userId}`);
+    console.log(sessionToken);
+
+    return sessionToken;
+  }
+  async revokeSessionToken(userId: string) {
+    const sessionToken = await this.cache.del(`key::${userId}`);
+    return sessionToken;
+  }
+  async storeSession(userId: string, jti: string) {
+    const storedSession = await this.cache.set(
+      `key::${userId}`,
+      jti,
+      604800000,
+    );
+
+    return storedSession;
+  }
+
+  async createSession(userId: string) {
     const sessionToken = this.createSessionToken(userId);
     const refreshToken = this.createRefreshToken(userId);
+
+    await this.storeSession(userId, sessionToken);
 
     return {
       sessionToken: sessionToken,

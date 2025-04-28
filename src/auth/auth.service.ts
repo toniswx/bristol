@@ -16,6 +16,7 @@ export class AuthService {
     private readonly session: SessionService,
     private readonly jwtService: JwtService,
   ) {}
+
   hashPassword(passwordToEncrypt: string): string {
     const encryptedPassword = hashSync(passwordToEncrypt, 2);
 

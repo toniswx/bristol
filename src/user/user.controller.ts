@@ -39,7 +39,7 @@ export class UserController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<User> {
     const newUserData = await this.userService.createUser(createUserDto);
-    const newSession = this.sessionService.createSession(newUserData.id);
+    const newSession = await this.sessionService.createSession(newUserData.id);
     response.cookie('set', newSession.sessionToken);
     response.cookie('ret', newSession.sessionToken);
     return newUserData;
