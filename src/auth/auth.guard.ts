@@ -28,7 +28,6 @@ export class AuthGuard implements CanActivate {
 
       request.userId = isValidJWT.sub;
 
-      console.log(isValidJWT);
       if (isValidJWT) return true;
       return false;
     } catch (err) {
