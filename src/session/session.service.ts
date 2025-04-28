@@ -8,6 +8,11 @@ export interface JwtPayload {
   exp?: number;
 }
 
+export interface SessionData {
+  sessionToken: string;
+  refreshToken: string;
+}
+
 @Injectable()
 export class SessionService {
   constructor(
