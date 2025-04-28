@@ -43,8 +43,10 @@ model Imovel {
   IPTU      String
   rooms     Int      
   bathrooms Int      
-  garage    Int      
-  sizeInSquareMeters Float  
+  garage    Int 
+  hasParking Boolean   
+  bedrooms Float  
+  area Float  
   
   user      User     @relation(fields: [userId], references: [id],onDelete: Cascade)
   userId    String
